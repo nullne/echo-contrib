@@ -386,8 +386,6 @@ func (p *Prometheus) HandlerFunc(next echo.HandlerFunc) echo.HandlerFunc {
 		elapsed := float64(time.Since(start)) / float64(time.Second)
 		resSz := float64(c.Response().Size)
 
-		p.reqDur.WithLabelValues(status, c.Request().Method, url).Observe(elapsed)
-
 		if len(p.URLLabelFromContext) > 0 {
 			u := c.Get(p.URLLabelFromContext)
 			if u == nil {
@@ -396,6 +394,7 @@ func (p *Prometheus) HandlerFunc(next echo.HandlerFunc) echo.HandlerFunc {
 			url = u.(string)
 		}
 
+		p.reqDur.WithLabelValues(status, c.Request().Method, url).Observe(elapsed)
 		p.reqCnt.WithLabelValues(status, c.Request().Method, c.Request().Host, url).Inc()
 		p.reqSz.WithLabelValues(status, c.Request().Method, url).Observe(float64(reqSz))
 		p.resSz.WithLabelValues(status, c.Request().Method, url).Observe(resSz)
